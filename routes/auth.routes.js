@@ -1,4 +1,4 @@
-const {Router, response} = require('express')
+const {Router} = require('express')
 const {check, validationResult} = require('express-validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -18,18 +18,18 @@ router.post(
     try {
         const errors = validationResult(req)
 
-        if (errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return res.status(400).json({
                 errors: errors.array(),
                 message: 'Некорректные данные при регистрации'
-            })
+            });
         }
 
         const {email, password} = req.body
 
-        const candidate = await User.findOne({ email })
+        const candidate = await User.findOne({email})
         if (candidate){
-            return  res.status(400).json({ message: 'такой пользователь уже существует' })
+            return  res.status(400).json({ message: 'Такой пользователь уже существует' })
         }
 
         const hashedPassword = await bcrypt.hash(password, 20)

@@ -11,8 +11,8 @@ const router = Router()
 router.post(
     '/register',
     [
-        check('email', 'Некорректный email').isEmail(),
-        check('password', 'Минимальная длинна пароля 8 символов').isLength({min: 8})
+        // check('email', 'Некорректный email').isEmail(),
+        // check('password', 'Минимальная длинна пароля 8 символов').isLength({min: 8})
     ],
     async(req, res) => {
     try {
@@ -32,7 +32,7 @@ router.post(
             return  res.status(400).json({ message: 'Такой пользователь уже существует' })
         }
 
-        const hashedPassword = await bcrypt.hash(password, 20)
+        const hashedPassword = await bcrypt.hash(password, 12)
         const user = new User({
             email,
             password: hashedPassword

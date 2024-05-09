@@ -8,6 +8,10 @@ export const useHttp = () => {
         setLoading(true);
 
         try {
+            if (body){
+                body = JSON.stringify(body)
+                headers['Content-Type'] = 'application/json'
+            }
             const options = {
                 method,
                 headers: {
@@ -23,7 +27,7 @@ export const useHttp = () => {
                 headers: headers
             });
             const data = await response.json();
-
+            console.log('Data =', data)
             if (!response.ok) {
                 throw new Error(data.message || 'Что-то пошло не так');
             }
@@ -37,9 +41,8 @@ export const useHttp = () => {
         }
     }, [])
 
-    const clearError = () => {
-        setError(null)
-    }
+    const clearError = useCallback( ()=>setError(null), [] )
+
 
     return {loading, request, error, clearError}
 }

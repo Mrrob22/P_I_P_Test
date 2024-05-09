@@ -1,15 +1,23 @@
 import React, {useState, useEffect} from 'react'
 import {useHttp} from '../hooks/http.hook'
+import {useMessage} from "../hooks/message.hook";
 
 
 export const AuthPage = () => {
-    const {loading, request} = useHttp()
+    const message = useMessage()
+    const {loading, request, error, clearError} = useHttp()
     const [form, setForm] = useState({
         email: '',
         password: ''
     })
 
+    useEffect( ()=>{
+        message(error)
+        clearError()
+    }, [error, message, clearError])
+
     const changeHandler = event => {
+        console.log('Event =', event.target.name, event.target.value)
         setForm({...form, [event.target.name]: event.target.value})
     }
 
@@ -35,7 +43,7 @@ export const AuthPage = () => {
                                     placeholder="Введите email"
                                     id="email"
                                     type="text"
-                                    name="password"
+                                    name="email"
                                     onChange={changeHandler}
                                 />
                                 <label htmlFor="email">Email</label>

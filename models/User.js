@@ -11,9 +11,9 @@ const schema = new Schema({
         required: true,
 
     },
-    links: [{
+    Cards: [{
         type: Types.ObjectId,
-        ref: 'Link'
+        ref: 'Card'
     }]
 })
 

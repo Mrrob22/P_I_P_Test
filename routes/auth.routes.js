@@ -11,8 +11,8 @@ const router = Router()
 router.post(
     '/register',
     [
-        // check('email', 'Некорректный email').isEmail(),
-        // check('password', 'Минимальная длинна пароля 8 символов').isLength({min: 8})
+        check('email', 'Некорректный email').isEmail(),
+        check('password', 'Минимальная длинна пароля 8 символов').isLength({min: 8})
     ],
     async(req, res) => {
     try {

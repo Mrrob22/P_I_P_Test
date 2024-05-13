@@ -1,108 +1,42 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, useCallback} from 'react'
 import {useHttp} from '../hooks/http.hook'
 import {useMessage} from "../hooks/message.hook";
 
 import {AuthContext} from "../context/AuthContext"
+import {Loader} from "../components/Loader";
+import {CardsList} from "../components/CardsList";
 
 
 export const CardsPage = () => {
-    const message = useMessage();
-    const auth = useContext(AuthContext);
-    const { loading, request } = useHttp();
-    const [form, setForm] = useState({
-        card_number: '',
-        cvv: '',
-        expiration_date: '',
-    });
+    const [cards, setCards] = useState([])
+    const {loading, request} = useHttp()
+    const {token} = useContext(AuthContext)
 
-    const createCard = async () => {
+    const fetchCards = useCallback(async () => {
         try {
-            // console.log('Create Card form = ', form);
+            const fetched = await request('/api/cards', 'GET', null, {
+                Authorization: `Basic ${token}`
+            });
 
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Basic ${auth.token}`
-                },
-                body: JSON.stringify(form)
-            };
+            setCards(fetched);
 
-            const response = await fetch('/api/card/generate-card', requestOptions); // Pass requestOptions directly to fetch
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // console.log('createCard data =', data);
-            message(data.message);
         } catch (error) {
-            console.error('Create Card Error:', error);
+            console.error('Error fetching cards:', error);
+            // Handle the error or set an error state
         }
-    };
-
-    const changeHandler = (event) => {
-        const fieldName = event.target.name;
-        const value = event.target.value;
-
-        setForm(prevForm => ({
-            ...prevForm,
-            [fieldName]: value,
-        }));
-    };
+    }, [token, request]);
 
     useEffect(() => {
-        // console.log('form =', form);
-    }, [form]);
+        fetchCards(); // Call fetchCards directly, no need to use .then()
+    }, []);
 
-    return(
-        <div>
-            <h1>Cards Page</h1>
-            <div className="input-field">
-                <input
-                    placeholder="Введите номер карты"
-                    id="card_number"
-                    type="text"
-                    name="card_number"
-                    onChange={changeHandler}
+    if(loading){
+        return <Loader/>
+    }
 
-                />
-                <label htmlFor="card_number">Card Number</label>
-            </div>
-            <div className="input-field">
-                <input
-                    placeholder="Введите cvv"
-                    id="cvv"
-                    type="password"
-                    name="cvv"
-                    onChange={changeHandler}
-
-                />
-                <label htmlFor="cvv">CVV</label>
-            </div>
-            <div className="input-field">
-                <input
-                    placeholder="Введите срок окончания действия"
-                    id="expiration_date"
-                    type="date"
-                    name="expiration_date"
-                    onChange={changeHandler}
-
-                />
-                <label htmlFor="expiration_date">Expiration Date</label>
-            </div>
-            <div className="card-action">
-                <button
-                    className="btn yellow darken-4"
-                    style={{marginRight: 10}}
-                    onClick={createCard}
-                    disabled={loading}
-                >
-                    Сохранить
-                </button>
-            </div>
-        </div>
+    return (
+        <>
+            {!loading && <CardsList  cards={cards}/>}
+        </>
     )
 }

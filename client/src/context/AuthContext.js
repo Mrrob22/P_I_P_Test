@@ -27,6 +27,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
     };
 
+    // console.log('token =', token)
+
     return (
         <AuthContext.Provider value={{ token, userId, login, logout, isAuthenticated }}>
             {children}

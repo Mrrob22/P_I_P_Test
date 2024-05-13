@@ -18,7 +18,10 @@ const schema = new Schema({
         type: String,
         // required: true
     },
-    owner: { type: Schema.Types.ObjectId, ref: 'User' }
+    owner: {
+        type: Types.ObjectId,
+        ref: 'User'
+    }
 })
 
 module.exports = model('Card', schema)

@@ -11,8 +11,8 @@ const schema = new Schema({
         required: true,
 
     },
-    Cards: [{
-        type: Types.ObjectId,
+    cards: [{
+        type: Schema.Types.ObjectId,
         ref: 'Card'
     }]
 })

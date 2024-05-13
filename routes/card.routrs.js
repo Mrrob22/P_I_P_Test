@@ -9,7 +9,7 @@ const config = require("config");
 const auth = require('../middleware/auth.middleware')
 
 router.post(
-    '/generate-card',
+    '/',
     auth,
     async (req, res) => {
 
@@ -21,16 +21,23 @@ router.post(
         const generateCard = new Card({
             card_number: card_number,
             cvv: cvv,
-            expiration_date: expiration_date
+            expiration_date: expiration_date,
+            owner: req.user.userId
         });
+
 
 
         res.json( generateCard )
 
         // console.log('card = ', generateCard)
 
-        await generateCard.save();
-        // console.log('Card saved successfully');
+        const result =  await generateCard.save();
+
+        if(result._id){
+
+        }
+
+        // console.log('Card saved successfully (result)', result);
 
        res.json({ message: 'Card saved successfully'});
         if (condition) {
@@ -45,14 +52,14 @@ router.post(
     }
 })
 
-router.get('/',auth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const cards = await Card.find({ owner: req.user.userId }) /// ????
-        res.json(cards)
-    } catch (e){
-        res.status(500).json({message: 'Что-то пошло не так, пробуйте снова (500 error)'})
+        const cards = await Card.find({ owner: req.user.userId });
+        res.json(cards);
+    } catch (e) {
+        res.status(500).json({ message: 'Что-то пошло не так, пробуйте снова (500 error)' });
     }
-})
+});
 
 router.get('/:id',auth, async (req, res) => {
     try {
@@ -62,5 +69,28 @@ router.get('/:id',auth, async (req, res) => {
         res.status(500).json({message: 'Что-то пошло не так, пробуйте снова (500 error)'})
     }
 })
+
+router.put('/updateCards/:userId/:cardId', async (req, res) => {
+    const { userId, cardId } = req.params;
+
+    try {
+        // Find the user by ID and update the cards array with the new cardId
+        const user = await User.findOneAndUpdate(
+            { _id: userId },
+            { $push: { cards: cardId } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: 'User cards array updated successfully', user });
+    } catch (error) {
+        console.error('Error updating user cards array:', error);
+        return res.status(500).json({ error: 'An error occurred while updating user cards array' });
+    }
+});
+
 
 module.exports = router

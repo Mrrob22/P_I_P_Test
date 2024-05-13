@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
     // console.log('Extracted token:', token);
 
     if (!token) {
-        console.log('Token is missing');
+        // console.log('Token is missing');
         return res.status(401).json({ message: 'Отсутствует токен авторизации' });
     }
 

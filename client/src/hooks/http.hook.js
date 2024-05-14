@@ -19,7 +19,6 @@ export const useHttp = () => {
             const options = {
                 method,
                 headers: {
-                    // 'Content-Type': 'application/json',
                     ...headers
                 },
                 body: body ? JSON.stringify(body) : null

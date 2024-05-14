@@ -22,26 +22,25 @@ export const CardsPage = () => {
             if (userRole === "1") {
 
                 const fetched = await request('/api/cards', 'GET', null, {
-                    Authorization: `Basic ${token}` // Use 'Bearer' for token
+                    Authorization: `Basic ${token}`
                 });
 
                 setCards(fetched);
             } else {
                 const fetched = await request(`/api/cards/user/${userId}`, 'GET', null, {
-                    Authorization: `Basic ${token}` // Use 'Bearer' for token
+                    Authorization: `Basic ${token}`
                 });
 
                 setCards(fetched);
             }
         } catch (error) {
             console.error('Error fetching cards:', error);
-            // Handle the error or set an error state
         }
     }, [token, request, userId]);
 
     useEffect(() => {
-        fetchCards(); // Call fetchCards directly, no need to use .then()
-    }, [fetchCards]); // Pass fetchCards as a dependency
+        fetchCards();
+    }, [fetchCards]);
 
     if (loading) {
         return <Loader />;

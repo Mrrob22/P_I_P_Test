@@ -10,7 +10,6 @@ router.get('/userData/:id', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Return all data associated with the user
         res.json(user);
     } catch (error) {
         console.error('Error retrieving user data:', error);

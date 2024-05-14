@@ -7,17 +7,14 @@ module.exports = (req, res, next) => {
     }
 
     const token = (req.headers.authorization && req.headers.authorization.split(" ")[1]) || '';
-    // console.log('Extracted token:', token);
 
     if (!token) {
-        // console.log('Token is missing');
         return res.status(401).json({ message: 'Отсутствует токен авторизации' });
     }
 
     try {
         if (token) {
             const decoded = jwt.verify(token, config.get('jwtsecret'));
-            // console.log('Decoded token:', decoded);
             req.user = decoded;
             next();
         } else {

@@ -5,7 +5,6 @@ import { useMessage } from '../hooks/message.hook';
 
 
 export const CreatePage = () => {
-    // const navigate = useNavigate();
     const location = useLocation();
     const { loading, request } = useHttp();
     const message = useMessage();
@@ -20,7 +19,6 @@ export const CreatePage = () => {
     const isEdit = queryParams.get("edit") === "true";
     const cardId = queryParams.get("cardId");
 
-    // Populate form fields if cardData exists in location state
 
     const fetchCardData = async () => {
         try {
@@ -136,8 +134,6 @@ export const CreatePage = () => {
                         name="card_number"
                         value={form.card_number}
                         onChange={changeHandler}
-                        // onFocus={()=>{ isEdit }}
-
                     />
                     <label htmlFor="card_number">Card Number</label>
                 </div>

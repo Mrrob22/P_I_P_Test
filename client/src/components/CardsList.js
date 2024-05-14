@@ -1,20 +1,28 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 export const CardsList = ({ cards }) => {
+    const navigate = useNavigate();
     const [userEmails, setUserEmails] = useState([]);
+    const [role, setRole] = useState(null);
     const [loadingEmails, setLoadingEmails] = useState(true);
     const [renderCount, setRenderCount] = useState(0); // Counter for render count
     const { loading: httpLoading, request } = useHttp();
-    const { userId } = useContext(AuthContext);
+    const { userId , auth} = useContext(AuthContext);
+
+    useEffect(() => {
+        setRenderCount(1); // Set render count to 1 on initial render
+    }, []);
 
     useEffect(() => {
         const fetchUserEmails = async () => {
             try {
 
                 const emails = [];
-                let emptyLineAdded = false;
+                // let emptyLineAdded = false;
                 const userDataResponseCheck = await request(
                     `/api/user/userData/${userId}`,
                     'GET'
@@ -22,6 +30,8 @@ export const CardsList = ({ cards }) => {
                 const userDataCheck = await userDataResponseCheck;
 
                 const userRole = await userDataCheck.role
+                setRole(userRole);
+
                 // Fetch user data for all cards if user has role 1
                 if (userRole === "1") {
                     for (const card of cards) {
@@ -37,8 +47,8 @@ export const CardsList = ({ cards }) => {
                         //     emptyLineAdded = true;
                         // }
                         const email = JSON.stringify(userData.email) || 'Unknown';
-                        console.log('userData 1 =', userData)
-                        console.log('emails =', emails)
+                        // console.log('userData 1 =', userData)
+                        // console.log('emails =', emails)
 
                         emails.push(email);
                     }
@@ -63,8 +73,8 @@ export const CardsList = ({ cards }) => {
                             // }
                             const email = JSON.stringify(userData.email)  || 'Unknown';
 
-                            console.log('userData 2 =', userData)
-                            console.log('emails =', emails)
+                            // console.log('userData 2 =', userData)
+                            // console.log('emails =', emails)
 
 
                             emails.push(email);
@@ -86,11 +96,31 @@ export const CardsList = ({ cards }) => {
         fetchUserEmails();
     }, [cards, request, userId]); // Include userId and userRole as dependencies
 
-    useEffect(() => {
-        setRenderCount(prevCount => prevCount + 1); // Increment render count on each render
-    }, []); // Run only on initial render
+    const handleEdit = async (cardId) => {
+        try {
+            const userDataJSON = localStorage.getItem('userData');
+            const userData = !!userDataJSON && JSON.parse(userDataJSON);
+            const token = userData.token;
 
-    if (httpLoading || loadingEmails || renderCount !== 2) { // Show loading message until second render
+            // Fetch the card data based on the cardId
+            const fetchedCardResponse = await request(`/api/cards/${cardId}`, 'GET', null, {
+                Authorization: `Basic ${token}` // Use Bearer authentication
+            });
+
+            // Navigate to the createPage with parameters
+            // navigate(`/createPage?edit=true&cardId=${cardId}`, { state: { cardData: fetchedCardResponse } });
+
+            navigate(`/create?edit=true&cardId=${cardId}`, { state: { cardData: fetchedCardResponse } });
+
+        } catch (error) {
+            console.error('Error fetching card data:', error);
+            // Handle the error appropriately, e.g., show an error message to the user
+        }
+    };
+
+    // Run only on initial render
+
+    if (httpLoading || loadingEmails || renderCount !== 1) { // Show loading message until first render
         return <p className="center">Loading...</p>;
     }
 
@@ -99,7 +129,7 @@ export const CardsList = ({ cards }) => {
     }
 
     // Check if all user emails have been fetched before rendering <td> elements
-    const allEmailsFetched = userEmails.length === cards.length;
+    // const allEmailsFetched = userEmails.length === cards.length;
 
 
 
@@ -123,6 +153,18 @@ export const CardsList = ({ cards }) => {
                         <td>{card.cvv}</td>
                         <td>{card.expiration_date}</td>
                         <td>{userEmails[index] || 'Loading...'}</td>
+                        <td>
+                            <button onClick={() => handleEdit(card._id, card)}>
+                                <img src="https://www.svgrepo.com/show/17716/gear.svg" alt=''
+                                     style={{width: '30px', height: '30px'}}/>
+                            </button>
+                            {!!role && role === "1" && (
+                                <button onClick={() => console.log('Click card =', card)}>
+                                    <img src="https://www.svgrepo.com/show/17716/gear.svg" alt=''
+                                         style={{width: '30px', height: '30px'}}/>
+                                </button>
+                            )}
+                        </td>
                     </tr>
                 );
             })}

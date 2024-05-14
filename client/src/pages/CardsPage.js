@@ -9,6 +9,7 @@ export const CardsPage = () => {
     const { loading, request } = useHttp();
     const { token , userId} = useContext(AuthContext);
 
+
     const fetchCards = useCallback(async () => {
         try {
             const userDataResponseCheck = await request(
@@ -26,7 +27,7 @@ export const CardsPage = () => {
 
                 setCards(fetched);
             } else {
-                const fetched = await request(`/api/cards/${userId}`, 'GET', null, {
+                const fetched = await request(`/api/cards/user/${userId}`, 'GET', null, {
                     Authorization: `Basic ${token}` // Use 'Bearer' for token
                 });
 

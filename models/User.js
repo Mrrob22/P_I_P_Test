@@ -11,6 +11,11 @@ const schema = new Schema({
         required: true,
 
     },
+    role: {
+      type: String,
+      required: true,
+      initial: 2
+    },
     cards: [{
         type: Schema.Types.ObjectId,
         ref: 'Card'

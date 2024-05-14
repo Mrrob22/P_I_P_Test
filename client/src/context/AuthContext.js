@@ -8,11 +8,14 @@ export const AuthContext = createContext({
     login: noop,
     logout: noop,
     isAuthenticated: false
+
 });
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userId, setUserId] = useState(null);
+    // const [userRole, setUserRole] = useState(2);
+
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const login = (token, userId) => {
@@ -24,6 +27,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setToken(null);
         setUserId(null);
+        // setUserRole(null)
         setIsAuthenticated(false);
     };
 

@@ -121,4 +121,33 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const cardId = req.params.id;
+
+        // Find the card by its id and delete it
+        const deletedCard = await Card.findByIdAndDelete(cardId);
+
+        if (!deletedCard) {
+            return res.status(404).json({ message: 'Card not found' });
+        }
+
+        // Update the user's cards array to remove the deleted card
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: deletedCard.owner },
+            { $pull: { cards: cardId } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ message: 'Card deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting card:', error);
+        res.status(500).json({ message: 'An error occurred while deleting the card' });
+    }
+});
+
 module.exports = router;

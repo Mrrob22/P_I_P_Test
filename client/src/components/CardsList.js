@@ -118,6 +118,27 @@ export const CardsList = ({ cards }) => {
         }
     };
 
+    const handleDelete = async (cardId) => {
+        try {
+            const userDataJSON = localStorage.getItem('userData');
+            const userData = !!userDataJSON && JSON.parse(userDataJSON);
+            const token = userData.token;
+
+            // Fetch the card data based on the cardId
+            const fetchedCardResponse = await request(`/api/cards/${cardId}`, 'DELETE', null, {
+                Authorization: `Basic ${token}` // Use Bearer authentication
+            });
+
+            // Navigate to the createPage with parameters
+            // navigate(`/createPage?edit=true&cardId=${cardId}`, { state: { cardData: fetchedCardResponse } });
+
+
+        } catch (error) {
+            console.error('Error deleting card:', error);
+            // Handle the error appropriately, e.g., show an error message to the user
+        }
+    }
+
     // Run only on initial render
 
     if (httpLoading || loadingEmails || renderCount !== 1) { // Show loading message until first render
@@ -159,8 +180,8 @@ export const CardsList = ({ cards }) => {
                                      style={{width: '30px', height: '30px'}}/>
                             </button>
                             {!!role && role === "1" && (
-                                <button onClick={() => console.log('Click card =', card)}>
-                                    <img src="https://www.svgrepo.com/show/17716/gear.svg" alt=''
+                                <button onClick={() => handleDelete(card._id)}>
+                                    <img src="https://www.svgrepo.com/show/20605/close-cross.svg" alt=''
                                          style={{width: '30px', height: '30px'}}/>
                                 </button>
                             )}
